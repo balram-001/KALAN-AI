@@ -3,7 +3,7 @@ import { RotateCcw } from 'lucide-react';
 
 interface SummaryCardsProps {
   openCount: number;
-  revopsCount: number;
+  needsReviewCount: number;
   adminCount: number;
   resolvedCount: number;
   onCardClick: (filter: string) => void;
@@ -12,7 +12,7 @@ interface SummaryCardsProps {
 
 export const SummaryCards: React.FC<SummaryCardsProps> = ({
   openCount,
-  revopsCount,
+  needsReviewCount,
   adminCount,
   resolvedCount,
   onCardClick,
@@ -20,7 +20,7 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
 }) => {
   const cards = [
     { title: 'Active conflicts', count: openCount, badge: 'Active', color: 'bg-red-50 text-red-600', filterVal: 'Active' },
-    { title: 'Needs RevOps review', count: revopsCount, badge: 'Needs review', color: 'bg-amber-50 text-amber-600', filterVal: 'Needs review' },
+    { title: 'Needs review', count: needsReviewCount, badge: 'Needs review', color: 'bg-amber-50 text-amber-600', filterVal: 'Needs review' },
     { title: 'Needs CRM admin', count: adminCount, badge: 'Admin', color: 'bg-red-50 text-red-600', filterVal: 'CRM Admin' },
     { title: 'Resolved this week', count: resolvedCount, badge: 'Resolved', color: 'bg-emerald-50 text-emerald-600', filterVal: 'Resolved' },
   ];

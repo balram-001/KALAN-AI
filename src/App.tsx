@@ -8,6 +8,12 @@ import { ConflictDetail } from './components/ConflictDetail';
 import { ResolutionLog } from './components/ResolutionLog';
 import { Overview } from './components/Overview';
 
+const sampleHistory: ResolutionHistoryItem[] = [
+  { id: 1, conflictId: 1042, company: 'Acme Inc.', action: 'Owner updated and conflict resolved', resolvedBy: 'CRM Admin', oldValue: 'Rahul Sharma', newValue: 'Priya Mehta', timestamp: 'Oct 21, 5:19 PM' },
+  { id: 2, conflictId: 1043, company: 'Beta Security', action: 'Assigned to RevOps', resolvedBy: 'CRM Admin', oldValue: 'CRM Admin', newValue: 'RevOps', timestamp: 'Oct 21, 5:20 PM' },
+  { id: 3, conflictId: 1044, company: 'CloudOps', action: 'Salesforce retry failed', resolvedBy: 'CRM Handoff Monitor', oldValue: 'Updated', newValue: 'Not updated', timestamp: 'Oct 21, 5:54 PM' },
+];
+
 export default function App() {
   const formatTimestamp = () =>
     new Date().toLocaleString([], { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -17,8 +23,8 @@ export default function App() {
     return saved ? JSON.parse(saved) : initialConflicts;
   });
   const [history, setHistory] = useState<ResolutionHistoryItem[]>(() => {
-    const saved = localStorage.getItem('crm_history');
-    return saved ? JSON.parse(saved) : [];
+    const saved = localStorage.getItem('crm_history_v2');
+    return saved ? JSON.parse(saved) : sampleHistory;
   });
   const [selectedConflict, setSelectedConflict] = useState<ConflictItem | null>(null);
   const [search, setSearch] = useState<string>('');
@@ -39,7 +45,7 @@ export default function App() {
   }, [conflicts]);
 
   useEffect(() => {
-    localStorage.setItem('crm_history', JSON.stringify(history));
+    localStorage.setItem('crm_history_v2', JSON.stringify(history));
   }, [history]);
 
   useEffect(() => {
@@ -199,7 +205,7 @@ export default function App() {
 
   // Metrics
   const openCount = conflicts.filter((c) => ['Open', 'Needs review', 'Assigned'].includes(c.status)).length;
-  const revopsCount = conflicts.filter((c) => c.assignedTo === 'RevOps' && c.status !== 'Resolved').length;
+  const needsReviewCount = conflicts.filter((c) => c.status === 'Needs review').length;
   const adminCount = conflicts.filter((c) => c.assignedTo === 'CRM Admin' && c.status !== 'Resolved').length;
   const resolvedCount = conflicts.filter((c) => c.status === 'Resolved').length;
   const statusCounts = ['All', 'Open', 'Needs review', 'Assigned', 'Resolved', 'Ignored'].reduce<Record<string, number>>((counts, status) => {
@@ -251,7 +257,7 @@ export default function App() {
           {activeTab === 'Conflicts' && (
             <SummaryCards
               openCount={openCount}
-              revopsCount={revopsCount}
+               needsReviewCount={needsReviewCount}
               adminCount={adminCount}
               resolvedCount={resolvedCount}
               onCardClick={handleCardClick}

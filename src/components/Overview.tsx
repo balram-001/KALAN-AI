@@ -57,7 +57,7 @@ export const Overview: React.FC<OverviewProps> = ({
           <div className="text-3xl font-bold text-slate-900">14 min</div><div className="mt-2 font-medium text-slate-800">Avg Resolution Time</div><div className="mt-1 text-xs text-slate-500">This week</div>
         </div>
         <div className="rounded-xl bg-amber-50 p-5">
-          <div className="text-3xl font-bold text-slate-900">{openCount}</div><div className="mt-2 font-medium text-slate-800">Open Conflicts</div><div className="mt-1 text-xs text-slate-500">Needs attention</div>
+          <div className="text-3xl font-bold text-slate-900">{openCount}</div><div className="mt-2 font-medium text-slate-800">Active Conflicts</div><div className="mt-1 text-xs text-slate-500">Needs attention</div>
         </div>
       </div>
     </section>
@@ -85,7 +85,7 @@ export const Overview: React.FC<OverviewProps> = ({
 
     <div className="grid gap-6 xl:grid-cols-2">
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
-        <h3 className="font-bold text-slate-900">Conflict breakdown</h3>
+        <div><h3 className="font-bold text-slate-900">Conflict breakdown</h3><p className="mt-1 text-xs text-slate-500">All conflicts</p></div>
         <div className="mt-4 divide-y divide-slate-100">
           {breakdown.map((item) => <button key={item.label} onClick={() => onCategoryClick(item.label)} className="flex w-full items-center justify-between py-3 text-left hover:bg-slate-50"><span className="flex items-center gap-2 text-sm font-medium text-slate-700"><span className={`h-2.5 w-2.5 rounded-full ${item.color}`} />{item.label}</span><span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-sm font-semibold text-slate-700">{item.count}</span></button>)}
         </div>
