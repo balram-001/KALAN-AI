@@ -19,7 +19,7 @@ export default function App() {
     new Date().toLocaleString([], { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   const [activeTab, setActiveTab] = useState<string>('Overview');
   const [conflicts, setConflicts] = useState<ConflictItem[]>(() => {
-    const saved = localStorage.getItem('crm_conflicts_v6');
+    const saved = localStorage.getItem('crm_conflicts_v7');
     return saved ? JSON.parse(saved) : initialConflicts;
   });
   const [history, setHistory] = useState<ResolutionHistoryItem[]>(() => {
@@ -41,7 +41,7 @@ export default function App() {
   const [ignoreReason, setIgnoreReason] = useState<string>('');
 
   useEffect(() => {
-    localStorage.setItem('crm_conflicts_v6', JSON.stringify(conflicts));
+    localStorage.setItem('crm_conflicts_v7', JSON.stringify(conflicts));
   }, [conflicts]);
 
   useEffect(() => {
@@ -142,7 +142,13 @@ export default function App() {
   const handleWorkflowAction = (id: number, action: string) => {
     const target = conflicts.find((conflict) => conflict.id === id);
     if (!target) return;
-    updateConflict(id, {}, action, target.status, target.status, `${action} successfully.`);
+    const timestamp = formatTimestamp();
+    const updated = { ...target, lastUpdated: timestamp };
+    setConflicts((previous) => previous.map((item) => item.id === id ? updated : item));
+    setSelectedConflict((previous) => previous?.id === id ? updated : previous);
+    addHistory(target, action, '', '');
+    setLastUpdated(timestamp);
+    setToastMessage(`${action} successfully.`);
   };
 
   const handleSourceChange = (id: number, newSource: SourceOfTruth) => {
@@ -150,6 +156,10 @@ export default function App() {
     if (!target) return;
     const recommendation = newSource === 'Requires review'
       ? 'Compare both Salesforce records with the HubSpot record before selecting the master record.'
+      : target.type === 'Owner mismatch' && newSource === 'HubSpot'
+      ? `Map the Salesforce user and set the record owner to ${target.hubspot}.`
+      : target.groupedFailures && newSource === 'HubSpot'
+      ? 'Map “Proposal” in Salesforce, then retry the 40 affected records.'
       : newSource === 'Salesforce'
       ? `Update HubSpot owner from ${target.hubspot} to ${target.salesforce}`
       : `Update Salesforce owner from ${target.salesforce} to ${target.hubspot}`;
@@ -318,6 +328,7 @@ export default function App() {
         {/* Right Detail Panel on Row Click */}
         {selectedConflict && (
           <ConflictDetail
+            key={selectedConflict.id}
             conflict={selectedConflict}
             onClose={() => setSelectedConflict(null)}
             onAssignRevOps={handleAssignRevOps}
@@ -357,7 +368,8 @@ export default function App() {
       {errorDetailsId !== null && (() => {
         const conflict = conflicts.find((item) => item.id === errorDetailsId);
         if (!conflict) return null;
-        return <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"><div role="dialog" aria-modal="true" className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"><div className="flex items-start justify-between"><div><h3 className="text-lg font-bold text-slate-900">Sync error details</h3><p className="mt-1 text-sm text-slate-500">Demo error information for this conflict</p></div><button onClick={() => setErrorDetailsId(null)} className="text-slate-400 hover:text-slate-700">×</button></div><dl className="mt-5 space-y-3 text-sm"><div><dt className="text-slate-400">Record</dt><dd className="font-medium text-slate-800">{conflict.company}</dd></div><div><dt className="text-slate-400">Direction</dt><dd className="font-medium text-slate-800">HubSpot → Salesforce</dd></div><div><dt className="text-slate-400">Failed field</dt><dd className="font-medium text-slate-800">Record owner</dd></div><div><dt className="text-slate-400">Attempted at</dt><dd className="font-medium text-slate-800">{conflict.lastUpdated}</dd></div><div><dt className="text-slate-400">Error message</dt><dd className="font-medium text-slate-800">Salesforce service temporarily unavailable</dd></div><div><dt className="text-slate-400">Retry policy</dt><dd className="font-medium text-slate-800">Automatic retry enabled (up to 5 attempts)</dd></div></dl><button onClick={() => setErrorDetailsId(null)} className="mt-6 w-full rounded-xl bg-slate-900 py-2 text-sm font-medium text-white">Close</button></div></div>;
+        const isPicklistMismatch = conflict.rootCause === 'Picklist mismatch';
+        return <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"><div role="dialog" aria-modal="true" className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"><div className="flex items-start justify-between"><div><h3 className="text-lg font-bold text-slate-900">Sync error details</h3><p className="mt-1 text-sm text-slate-500">Demo error information for this conflict</p></div><button onClick={() => setErrorDetailsId(null)} className="text-slate-400 hover:text-slate-700">×</button></div><dl className="mt-5 space-y-3 text-sm"><div><dt className="text-slate-400">Record</dt><dd className="font-medium text-slate-800">{conflict.company}</dd></div><div><dt className="text-slate-400">Direction</dt><dd className="font-medium text-slate-800">HubSpot → Salesforce</dd></div><div><dt className="text-slate-400">Failed field</dt><dd className="font-medium text-slate-800">{isPicklistMismatch ? 'Deal stage' : 'Record owner'}</dd></div><div><dt className="text-slate-400">Attempted at</dt><dd className="font-medium text-slate-800">{conflict.lastUpdated}</dd></div><div><dt className="text-slate-400">Error message</dt><dd className="font-medium text-slate-800">{isPicklistMismatch ? 'Proposal is not available in the Salesforce picklist.' : 'Salesforce service temporarily unavailable'}</dd></div><div><dt className="text-slate-400">Retry policy</dt><dd className="font-medium text-slate-800">{isPicklistMismatch ? 'Disabled until picklist mapping is resolved' : 'Automatic retry enabled (up to 5 attempts)'}</dd></div></dl><button onClick={() => setErrorDetailsId(null)} className="mt-6 w-full rounded-xl bg-slate-900 py-2 text-sm font-medium text-white">Close</button></div></div>;
       })()}
       {pendingIgnoreId !== null && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"><div role="dialog" aria-modal="true" className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"><h3 className="text-lg font-bold text-slate-900">Ignore this conflict?</h3><p className="mt-2 text-sm text-slate-500">Select a reason to keep the audit trail complete.</p><select value={ignoreReason} onChange={(event) => setIgnoreReason(event.target.value)} className="mt-5 w-full rounded-xl border border-slate-200 p-2.5 text-sm"><option value="">Reason required</option><option>Duplicate business rule</option><option>Manual exception</option><option>Not actionable</option><option>Other</option></select><div className="mt-6 flex justify-end gap-3"><button onClick={() => { setPendingIgnoreId(null); setIgnoreReason(''); }} className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700">Cancel</button><button disabled={!ignoreReason} onClick={() => handleIgnore(pendingIgnoreId)} className="rounded-xl bg-slate-700 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-slate-300">Ignore conflict</button></div></div></div>}
     </div>

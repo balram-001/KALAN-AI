@@ -45,7 +45,7 @@ export const initialConflicts: ConflictItem[] = [
     id: 1045, company: "Northstar Labs", type: "Owner mismatch", hubspot: "Aarav Patel", salesforce: "Maya Singh", sourceOfTruth: "Salesforce", assignedTo: "CRM Admin", status: "Open", recommendation: "Update HubSpot owner from Aarav Patel to Maya Singh", detectedAt: "21 Oct 2026", lastUpdated: "21 Oct 2026, 4:38 PM"
   },
   {
-    id: 1046, company: "Vertex Health", type: "Owner mismatch", hubspot: "Neha Kapoor", salesforce: "Rohan Verma", sourceOfTruth: "Salesforce", assignedTo: "CRM Admin", status: "Needs review", recommendation: "Update HubSpot owner from Neha Kapoor to Rohan Verma", detectedAt: "21 Oct 2026", lastUpdated: "21 Oct 2026, 4:40 PM"
+    id: 1046, company: "Vertex Health", type: "Owner mismatch", hubspot: "Rohan Verma", salesforce: "Unassigned", sourceOfTruth: "HubSpot", assignedTo: "CRM Admin", status: "Needs review", recommendation: "Map the Salesforce user and set the record owner to Rohan Verma.", detectedAt: "21 Oct 2026", lastUpdated: "28 Oct 2026, 3:20 PM", rootCause: "Unmapped / inactive Salesforce user"
   },
   {
     id: 1047, company: "BrightPath", type: "Owner mismatch", hubspot: "Ishaan Roy", salesforce: "Ananya Das", sourceOfTruth: "Salesforce", assignedTo: "RevOps", status: "Assigned", recommendation: "Update HubSpot owner from Ishaan Roy to Ananya Das", detectedAt: "21 Oct 2026", lastUpdated: "21 Oct 2026, 4:42 PM"
@@ -69,6 +69,6 @@ export const initialConflicts: ConflictItem[] = [
     id: 1053, company: "Summit Digital", type: "Owner mismatch", hubspot: "Karan Shah", salesforce: "Sara Khan", sourceOfTruth: "Salesforce", assignedTo: "RevOps", status: "Needs review", recommendation: "Update HubSpot owner from Karan Shah to Sara Khan", detectedAt: "21 Oct 2026", lastUpdated: "21 Oct 2026, 4:54 PM"
   },
   {
-    id: 1054, company: "Proposal stage sync failures", type: "Sync failed", hubspot: "Proposal", salesforce: "Not available", sourceOfTruth: "Requires review", assignedTo: "CRM Admin", status: "Open", recommendation: "Map the Proposal picklist value before retrying these records.", detectedAt: "28 Oct 2026, 10:15 AM", lastUpdated: "28 Oct 2026, 10:15 AM", groupedFailures: 40, revenueAtRisk: "₹18,00,000", rootCause: "Picklist mismatch — Proposal not available in Salesforce"
+    id: 1054, company: "Proposal stage sync failures", type: "Sync failed", hubspot: "Proposal", salesforce: "Not available", sourceOfTruth: "HubSpot", assignedTo: "CRM Admin", status: "Open", recommendation: "Map “Proposal” in Salesforce, then retry the 40 affected records.", detectedAt: "28 Oct 2026, 9:42 AM", lastUpdated: "28 Oct 2026, 10:15 AM", groupedFailures: 40, revenueAtRisk: "₹18,00,000", rootCause: "Picklist mismatch"
   }
 ];
