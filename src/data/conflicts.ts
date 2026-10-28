@@ -67,5 +67,8 @@ export const initialConflicts: ConflictItem[] = [
   },
   {
     id: 1053, company: "Summit Digital", type: "Owner mismatch", hubspot: "Karan Shah", salesforce: "Sara Khan", sourceOfTruth: "Salesforce", assignedTo: "RevOps", status: "Needs review", recommendation: "Update HubSpot owner from Karan Shah to Sara Khan", detectedAt: "21 Oct 2026", lastUpdated: "21 Oct 2026, 4:54 PM"
+  },
+  {
+    id: 1054, company: "Proposal stage sync failures", type: "Sync failed", hubspot: "Proposal", salesforce: "Not available", sourceOfTruth: "Requires review", assignedTo: "CRM Admin", status: "Open", recommendation: "Map the Proposal picklist value before retrying these records.", detectedAt: "28 Oct 2026, 10:15 AM", lastUpdated: "28 Oct 2026, 10:15 AM", groupedFailures: 40, revenueAtRisk: "₹18,00,000", rootCause: "Picklist mismatch — Proposal not available in Salesforce"
   }
 ];

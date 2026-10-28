@@ -15,6 +15,9 @@ export interface ConflictItem {
   detectedAt: string;
   lastUpdated: string;
   previousHubspot?: string;
+  groupedFailures?: number;
+  revenueAtRisk?: string;
+  rootCause?: string;
 }
 
 export interface ResolutionHistoryItem {

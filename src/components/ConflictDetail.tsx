@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X, RotateCw, Trash2 } from 'lucide-react';
 import type { ConflictItem, ResolutionHistoryItem, SourceOfTruth } from '../types/conflict';
 
@@ -29,10 +29,14 @@ export const ConflictDetail: React.FC<ConflictDetailProps> = ({
   history,
   isRetrying,
 }) => {
+  const [rootCause, setRootCause] = useState(conflict.rootCause ?? (conflict.type === 'Owner mismatch' ? 'Unmapped / inactive Salesforce user' : conflict.type === 'Possible duplicate' ? 'Duplicate record' : conflict.type === 'Sync failed' ? 'Validation rule failure' : 'Routing rule conflict'));
   const field = conflict.type === 'Owner mismatch' ? 'Record owner' : conflict.type === 'Possible duplicate' ? 'Account record' : conflict.type === 'Sync failed' ? 'Salesforce sync' : 'Account mapping';
   const hubspotLabel = conflict.type === 'Owner mismatch' ? 'HubSpot' : conflict.type === 'Possible duplicate' ? 'HubSpot records' : conflict.type === 'Sync failed' ? 'HubSpot status' : 'HubSpot account';
   const salesforceLabel = conflict.type === 'Owner mismatch' ? 'Salesforce' : conflict.type === 'Possible duplicate' ? 'Salesforce records' : conflict.type === 'Sync failed' ? 'Salesforce status' : 'Salesforce account';
   const conflictHistory = history.filter((item, index, entries) => item.conflictId === conflict.id && entries.findIndex((candidate) => candidate.conflictId === item.conflictId && candidate.action === item.action) === index).slice(0, 4);
+  const fieldDiffs = conflict.type === 'Owner mismatch'
+    ? [['Owner', conflict.hubspot, conflict.salesforce, 'Yes'], ['Email', 'rahul@company.com', 'rahul@company.com', 'No'], ['Phone', '+91 98xxxxxxx', 'blank', 'Yes'], ['Company', conflict.company, conflict.company, 'No']]
+    : [['Primary field', conflict.hubspot, conflict.salesforce, 'Yes'], ['Company', conflict.company, conflict.company, 'No']];
   return (
     <aside className="w-96 min-h-0 overflow-y-auto bg-white border-l border-slate-200 p-6 flex flex-col justify-between shrink-0 shadow-lg z-10 animate-in slide-in-from-right duration-200">
       <div className="space-y-6">
@@ -96,10 +100,27 @@ export const ConflictDetail: React.FC<ConflictDetailProps> = ({
             <p className="font-medium text-slate-800">{conflict.assignedTo}</p>
           </div>
 
+          {conflict.type === 'Owner mismatch' && <div className="rounded-xl border border-blue-100 bg-blue-50 p-3.5"><p className="text-xs font-semibold uppercase tracking-wider text-blue-500">Investigation</p><p className="mt-1 text-sm font-medium text-slate-800">Contact: Rahul Sharma</p><p className="mt-1 text-sm text-slate-600">Open deal: ₹4,50,000 · Proposal · <span className="font-medium text-red-600">Revenue at risk: High</span></p><p className="mt-1 text-xs text-slate-500">Last successful sync: Oct 24, 2026, 6:12 PM</p></div>}
+
+          {conflict.groupedFailures && <div className="rounded-xl border border-amber-200 bg-amber-50 p-3.5"><p className="text-sm font-bold text-amber-900">{conflict.groupedFailures} failed syncs</p><p className="mt-1 text-sm text-amber-800">Root cause: {conflict.rootCause}</p><p className="mt-1 text-sm text-amber-800">Revenue at risk: {conflict.revenueAtRisk}</p><p className="mt-1 text-xs text-amber-700">Grouped issue · Suggested owner: CRM Admin</p></div>}
+
           <div>
             <label className="text-xs text-slate-400 uppercase tracking-wider font-semibold block mb-1">{hubspotLabel}</label>
             <p className="font-medium text-slate-800">{conflict.previousHubspot ? `${conflict.previousHubspot} → ${conflict.hubspot}` : conflict.hubspot}</p>
           </div>
+
+          <div className="border-t border-slate-100 pt-4">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Field-level diff</h4>
+            <div className="mt-3 overflow-x-auto rounded-lg border border-slate-200"><table className="w-full text-left text-xs"><thead className="bg-slate-50 text-slate-500"><tr><th className="p-2">Field</th><th className="p-2">HubSpot</th><th className="p-2">Salesforce</th><th className="p-2">Conflict</th></tr></thead><tbody>{fieldDiffs.map(([fieldName, hubspotValue, salesforceValue, mismatch]) => <tr key={fieldName} className="border-t border-slate-100"><td className="p-2 font-medium text-slate-700">{fieldName}</td><td className="p-2 text-slate-600">{hubspotValue}</td><td className="p-2 text-slate-600">{salesforceValue}</td><td className={`p-2 font-medium ${mismatch === 'Yes' ? 'text-red-600' : 'text-emerald-600'}`}>{mismatch}</td></tr>)}</tbody></table></div>
+          </div>
+
+          <div className="rounded-xl border border-violet-100 bg-violet-50 p-3.5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-violet-600">Likely root cause</p><p className="mt-1 text-sm font-semibold text-slate-800">{conflict.rootCause ?? rootCause}</p><p className="mt-1 text-xs text-slate-600">Suggested owner: {rootCause.includes('Routing') || rootCause.includes('Duplicate') ? 'RevOps' : 'CRM Admin'}</p>
+            <label className="mt-3 block text-xs font-semibold text-slate-500">Confirm root cause</label><select value={rootCause} onChange={(event) => setRootCause(event.target.value)} className="mt-1 w-full rounded-lg border border-violet-200 bg-white p-2 text-xs text-slate-700"><option>Routing rule conflict</option><option>Unmapped / inactive Salesforce user</option><option>Validation rule failure</option><option>Picklist mismatch</option><option>Duplicate record</option></select>
+            <button onClick={() => onWorkflowAction(conflict.id, `Confirmed triage: ${rootCause}`)} className="mt-2 rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-violet-700">Confirm triage</button>
+          </div>
+
+          <div className="rounded-xl border border-slate-200 p-3.5"><p className="text-xs font-semibold uppercase tracking-wider text-slate-400">System of record</p><p className="mt-2 text-sm text-slate-700">Owner: <b>HubSpot</b></p><p className="mt-1 text-sm text-slate-700">Phone: <b>Salesforce</b></p></div>
 
           <div>
             <label className="text-xs text-slate-400 uppercase tracking-wider font-semibold block mb-1">{salesforceLabel}</label>
@@ -147,9 +168,11 @@ export const ConflictDetail: React.FC<ConflictDetailProps> = ({
       {/* Action Buttons */}
       <div className="pt-6 border-t border-slate-100 space-y-2">
         {conflict.type === 'Owner mismatch' && <div className="flex gap-2"><button onClick={() => onApplyFix(conflict.id)} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-xl text-sm transition shadow-sm">Apply fix</button><button onClick={() => onAssignRevOps(conflict.id)} className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium py-2 rounded-xl text-sm transition">Reassign</button></div>}
-        {conflict.type === 'Possible duplicate' && <div className="flex gap-2"><button onClick={() => onWorkflowAction(conflict.id, 'Compared records')} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-xl text-sm transition">Compare records</button><button onClick={() => onWorkflowAction(conflict.id, 'Selected master record')} className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium py-2 rounded-xl text-sm transition">Select master</button></div>}
+        {conflict.type === 'Possible duplicate' && <><div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900"><b>Risk: Irreversible</b><br />Action: Merge duplicate contacts<br />Requires approval from: CRM Admin</div><div className="flex gap-2"><button onClick={() => onWorkflowAction(conflict.id, 'Compared records')} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-xl text-sm transition">Compare records</button><button onClick={() => onWorkflowAction(conflict.id, 'Approval requested for duplicate merge')} className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium py-2 rounded-xl text-sm transition">Request approval</button></div></>}
         {conflict.type === 'Sync failed' && <><div className="flex gap-2"><button disabled={isRetrying} onClick={() => onRetrySync(conflict.id)} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 rounded-xl text-sm transition"><RotateCw className="inline mr-1" size={14} />{isRetrying ? 'Retrying...' : 'Retry sync'}</button><button onClick={() => onViewError(conflict.id)} className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium py-2 rounded-xl text-sm transition">View error details</button></div><div className="flex gap-2"><button onClick={() => onAssignRevOps(conflict.id)} className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2 rounded-xl text-sm transition">Reassign</button><span className="flex-1 py-2 text-center text-xs text-slate-400">Next automatic retry: in 2 minutes</span></div></>}
-        {conflict.type === 'Missing account' && <div className="flex gap-2"><button onClick={() => onWorkflowAction(conflict.id, 'Linked existing account')} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-xl text-sm transition">Link account</button><button onClick={() => onWorkflowAction(conflict.id, 'Created HubSpot account')} className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium py-2 rounded-xl text-sm transition">Create account</button></div>}
+        {conflict.type === 'Missing account' && <><div className="flex gap-2"><button onClick={() => onWorkflowAction(conflict.id, 'Linked existing account')} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-xl text-sm transition">Link account</button><button onClick={() => onWorkflowAction(conflict.id, 'Created HubSpot account')} className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium py-2 rounded-xl text-sm transition">Create account</button></div><button onClick={() => onWorkflowAction(conflict.id, 'Auto-filled blank field')} className="w-full rounded-xl bg-emerald-50 py-2 text-xs font-medium text-emerald-700 hover:bg-emerald-100">Auto-fill blank field</button></>}
+        {conflict.type === 'Sync failed' && <button onClick={() => onWorkflowAction(conflict.id, 'Auto-retry enabled')} className="w-full rounded-xl bg-emerald-50 py-2 text-xs font-medium text-emerald-700 hover:bg-emerald-100">Auto-retry enabled</button>}
+        <div className="grid grid-cols-2 gap-2 pt-1"><button title="Live integration pending." onClick={() => onWorkflowAction(conflict.id, 'Requested HubSpot record')} className="rounded-xl border border-slate-200 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">Open in HubSpot</button><button title="Live integration pending." onClick={() => onWorkflowAction(conflict.id, 'Requested Salesforce record')} className="rounded-xl border border-slate-200 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">Open in Salesforce</button></div>
         <button
           onClick={() => onIgnore(conflict.id)}
           className="w-full flex items-center justify-center gap-1.5 text-slate-400 hover:text-red-500 py-1.5 text-xs font-medium transition"

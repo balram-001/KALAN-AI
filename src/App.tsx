@@ -19,7 +19,7 @@ export default function App() {
     new Date().toLocaleString([], { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   const [activeTab, setActiveTab] = useState<string>('Overview');
   const [conflicts, setConflicts] = useState<ConflictItem[]>(() => {
-    const saved = localStorage.getItem('crm_conflicts_v5');
+    const saved = localStorage.getItem('crm_conflicts_v6');
     return saved ? JSON.parse(saved) : initialConflicts;
   });
   const [history, setHistory] = useState<ResolutionHistoryItem[]>(() => {
@@ -41,7 +41,7 @@ export default function App() {
   const [ignoreReason, setIgnoreReason] = useState<string>('');
 
   useEffect(() => {
-    localStorage.setItem('crm_conflicts_v5', JSON.stringify(conflicts));
+    localStorage.setItem('crm_conflicts_v6', JSON.stringify(conflicts));
   }, [conflicts]);
 
   useEffect(() => {
