@@ -123,6 +123,10 @@ export default function App() {
   const handleRetrySync = (id: number) => {
     const target = conflicts.find((conflict) => conflict.id === id);
     if (!target) return;
+    if (target.rootCause === 'Validation rule failure') {
+      setToastMessage('Retry is blocked until the Salesforce validation rule is resolved.');
+      return;
+    }
     setRetryingId(id);
     window.setTimeout(() => {
       updateConflict(id, { salesforce: target.hubspot, status: 'Resolved', recommendation: 'Salesforce updated successfully.' }, 'Error fixed: Salesforce update succeeded', target.salesforce, target.hubspot, 'Error fixed successfully. Salesforce is now updated.');
