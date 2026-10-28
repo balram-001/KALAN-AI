@@ -37,12 +37,13 @@ export const initialConflicts: ConflictItem[] = [
     sourceOfTruth: "Salesforce",
     assignedTo: "CRM Admin",
     status: "Open",
-    recommendation: "Retry Salesforce update",
+    recommendation: "Resolve the Salesforce validation rule failure, then retry the update.",
     detectedAt: "21 Oct 2026",
-    lastUpdated: "21 Oct 2026, 4:35 PM"
+    lastUpdated: "21 Oct 2026, 4:35 PM",
+    rootCause: "Validation rule failure"
   },
   {
-    id: 1045, company: "Northstar Labs", type: "Owner mismatch", hubspot: "Aarav Patel", salesforce: "Maya Singh", sourceOfTruth: "Salesforce", assignedTo: "CRM Admin", status: "Open", recommendation: "Update HubSpot owner from Aarav Patel to Maya Singh", detectedAt: "21 Oct 2026", lastUpdated: "21 Oct 2026, 4:38 PM"
+    id: 1045, company: "Northstar Labs", type: "Owner mismatch", hubspot: "Aarav Patel", salesforce: "Maya Singh", sourceOfTruth: "Salesforce", assignedTo: "CRM Admin", status: "Open", recommendation: "Confirm Maya Singh is active and correctly mapped, then update HubSpot owner from Aarav Patel to Maya Singh.", detectedAt: "21 Oct 2026", lastUpdated: "21 Oct 2026, 4:38 PM", rootCause: "Unmapped / inactive Salesforce user"
   },
   {
     id: 1046, company: "Vertex Health", type: "Owner mismatch", hubspot: "Rohan Verma", salesforce: "Unassigned", sourceOfTruth: "HubSpot", assignedTo: "CRM Admin", status: "Needs review", recommendation: "Map the Salesforce user and set the record owner to Rohan Verma.", detectedAt: "21 Oct 2026", lastUpdated: "28 Oct 2026, 3:20 PM", rootCause: "Unmapped / inactive Salesforce user"
