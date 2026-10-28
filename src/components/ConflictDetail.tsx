@@ -33,7 +33,7 @@ export const ConflictDetail: React.FC<ConflictDetailProps> = ({
   const field = conflict.type === 'Owner mismatch' ? 'Record owner' : conflict.type === 'Possible duplicate' ? 'Account record' : conflict.type === 'Sync failed' ? 'Salesforce sync' : 'Account mapping';
   const hubspotLabel = conflict.type === 'Owner mismatch' ? 'HubSpot' : conflict.type === 'Possible duplicate' ? 'HubSpot records' : conflict.type === 'Sync failed' ? 'HubSpot status' : 'HubSpot account';
   const salesforceLabel = conflict.type === 'Owner mismatch' ? 'Salesforce' : conflict.type === 'Possible duplicate' ? 'Salesforce records' : conflict.type === 'Sync failed' ? 'Salesforce status' : 'Salesforce account';
-  const conflictHistory = history.filter((item, index, entries) => item.conflictId === conflict.id && !(conflict.id === 1044 && item.action.includes('Error fixed')) && entries.findIndex((candidate) => candidate.conflictId === item.conflictId && candidate.action === item.action) === index).slice(0, 4);
+  const conflictHistory = history.filter((item, index, entries) => item.conflictId === conflict.id && conflict.id !== 1044 && entries.findIndex((candidate) => candidate.conflictId === item.conflictId && candidate.action === item.action) === index).slice(0, 4);
   const isPicklistMismatch = conflict.rootCause === 'Picklist mismatch';
   const isPermanentSyncError = conflict.rootCause === 'Picklist mismatch' || conflict.rootCause === 'Validation rule failure';
   const fieldDiffs = conflict.groupedFailures
@@ -42,6 +42,8 @@ export const ConflictDetail: React.FC<ConflictDetailProps> = ({
     ? [['Owner', conflict.hubspot, conflict.salesforce, 'Yes'], ['Email', 'rahul@company.com', 'rahul@company.com', 'No'], ['Phone', '+91 98xxxxxxx', 'blank', 'Yes'], ['Company', conflict.company, conflict.company, 'No']]
     : conflict.id === 1044
     ? [['Deal stage', 'Proposal', 'Not updated', 'Yes'], ['Company', 'CloudOps', 'CloudOps', 'No']]
+    : conflict.id === 1052
+    ? [['Account', 'Missing', 'Atlas Works', 'Yes']]
     : conflict.type === 'Possible duplicate'
     ? [['HubSpot records', conflict.hubspot, '—', 'No'], ['Salesforce records', '—', conflict.salesforce, 'Yes'], ['Possible match confidence', 'High', 'High', 'No']]
     : [['Primary field', conflict.hubspot, conflict.salesforce, 'Yes'], ['Company', conflict.company, conflict.company, 'No']];

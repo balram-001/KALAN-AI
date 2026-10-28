@@ -37,7 +37,7 @@ export const initialConflicts: ConflictItem[] = [
     sourceOfTruth: "Salesforce",
     assignedTo: "CRM Admin",
     status: "Open",
-    recommendation: "Resolve the Salesforce validation rule failure, then retry the update.",
+    recommendation: "Resolve the Salesforce validation rule failure, then retry the deal stage update.",
     detectedAt: "21 Oct 2026",
     lastUpdated: "21 Oct 2026, 4:35 PM",
     rootCause: "Validation rule failure"
@@ -64,7 +64,7 @@ export const initialConflicts: ConflictItem[] = [
     id: 1051, company: "Greenline Media", type: "Sync failed", hubspot: "Updated", salesforce: "Not updated", sourceOfTruth: "Salesforce", assignedTo: "RevOps", status: "Assigned", recommendation: "Retry Salesforce update", detectedAt: "21 Oct 2026", lastUpdated: "21 Oct 2026, 4:50 PM"
   },
   {
-    id: 1052, company: "Atlas Works", type: "Missing account", hubspot: "Account missing", salesforce: "Account present", sourceOfTruth: "Salesforce", assignedTo: "CRM Admin", status: "Open", recommendation: "Create missing HubSpot account", detectedAt: "21 Oct 2026", lastUpdated: "21 Oct 2026, 4:52 PM"
+    id: 1052, company: "Atlas Works", type: "Missing account", hubspot: "Missing", salesforce: "Atlas Works", sourceOfTruth: "Salesforce", assignedTo: "CRM Admin", status: "Open", recommendation: "Link the existing Salesforce account to HubSpot, or create a HubSpot account only if no match exists.", detectedAt: "21 Oct 2026", lastUpdated: "21 Oct 2026, 4:52 PM", rootCause: "Missing account mapping"
   },
   {
     id: 1053, company: "Summit Digital", type: "Owner mismatch", hubspot: "Karan Shah", salesforce: "Sara Khan", sourceOfTruth: "Salesforce", assignedTo: "RevOps", status: "Needs review", recommendation: "Update HubSpot owner from Karan Shah to Sara Khan", detectedAt: "21 Oct 2026", lastUpdated: "21 Oct 2026, 4:54 PM"
