@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, AlertCircle, CheckCircle2, Settings } from 'lucide-react';
+import { LayoutDashboard, BellRing, UserRoundCog, DatabaseZap, CheckCircle2, SlidersHorizontal, Settings } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
@@ -9,8 +9,11 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
   const menuItems = [
     { name: 'Overview', icon: LayoutDashboard },
-    { name: 'Conflicts', icon: AlertCircle },
-    { name: 'Resolution Log', icon: CheckCircle2 },
+    { name: 'Follow-up Queue', icon: BellRing },
+    { name: 'Ownership Issues', icon: UserRoundCog },
+    { name: 'Data & Sync Health', icon: DatabaseZap },
+    { name: 'Resolved', icon: CheckCircle2 },
+    { name: 'SLA Rules', icon: SlidersHorizontal },
     { name: 'Settings', icon: Settings },
   ];
 
